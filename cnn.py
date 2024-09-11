@@ -1,12 +1,13 @@
 from collections import namedtuple
-from tensorflow.keras.datasets import cifar10 as cf10
-from tensorflow.keras.utils import to_categorical
-from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
-from tensorflow.keras.metrics import Precision, Recall
+
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
+from tensorflow.keras import Sequential
+from tensorflow.keras.datasets import cifar10 as cf10
+from tensorflow.keras.layers import Conv2D, Dense, Flatten, MaxPooling2D
+from tensorflow.keras.metrics import Precision, Recall
+from tensorflow.keras.utils import to_categorical
 
 _MAX_PIXEL_VALUE=255
 METRICS = ["accuracy", Precision(), Recall()]
@@ -19,9 +20,14 @@ class Cf10:
         self.test_set:Dataset = None
 
     def load_generate_train_test_sets(self):
-        (training_images, training_labels), (test_images, test_labels) = cf10.load_data()
+        (training_images, training_labels), (test_images, test_labels) \
+            = cf10.load_data()
+
         (training_images, test_images) = Cf10._normalize(training_images, test_images)
-        (training_labels, test_labels) = Cf10._one_hot_encode(training_labels, test_labels)
+
+        (training_labels, test_labels) = (
+            Cf10._one_hot_encode(training_labels, test_labels))
+
         self.training_set = Dataset(images=training_images, labels=training_labels)
         self.test_set = Dataset(images=test_images, labels=test_labels)
 
@@ -58,7 +64,7 @@ class CNNBuilder:
 
         return self
 
-    def add_max_pooling_Layer(self, pool_size:int):
+    def add_max_pooling_layer(self, pool_size:int):
         self._model.add(MaxPooling2D((pool_size, pool_size)))
         return self
 

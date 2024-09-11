@@ -1,6 +1,15 @@
 from tensorflow.keras import Sequential
-from cnn import (Cf10, Dataset, CNNBuilder, Compiler, Fitter, PerformancePlot,
-                 Predictor, ConfusionMatrix)
+
+from cnn import (
+                 Cf10,
+                 CNNBuilder,
+                 Compiler,
+                 ConfusionMatrix,
+                 Dataset,
+                 Fitter,
+                 PerformancePlot,
+                 Predictor,
+)
 
 # Load CF-10 dataset and split into training and test sets
 cf10 = Cf10()
@@ -21,14 +30,14 @@ class_names = class_names = [
             "frog",
             "horse",
             "ship",
-            "truck"
+            "truck",
         ]
 
 builder = CNNBuilder()
 builder.add_convolution_layer(32, 3, input_shape=INPUT_SHAPE)
-builder.add_max_pooling_Layer(2)
+builder.add_max_pooling_layer(2)
 builder.add_convolution_layer(64, 3)
-builder.add_max_pooling_Layer(2)
+builder.add_max_pooling_layer(2)
 builder.add_flattening_layer()
 builder.add_fully_connected_layer(128)
 builder.add_output_layer(len(class_names))
