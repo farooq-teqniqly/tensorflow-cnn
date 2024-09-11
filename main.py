@@ -1,28 +1,48 @@
-from tensorflow.keras.datasets import cifar10 as cf10
-from tensorflow.keras.utils import to_categorical
+from tensorflow.keras import Sequential
+from cnn import Cf10, Dataset, CNNBuilder, Compiler, Fitter, PerformancePlot
 
-# Load dataset
-(train_images, train_labels), (test_images, test_labels) = cf10.load_data()
+# Load CF-10 dataset and split into training and test sets
+cf10 = Cf10()
+cf10.load_generate_train_test_sets()
+train_set:Dataset = cf10.training_set
+test_set:Dataset = cf10.test_set
 
-class_names = [
-    "airplane",
-    "automobile",
-    "bird",
-    "cat",
-    "deer",
-    "dog",
-    "frog",
-    "horse",
-    "ship",
-    "truck"
-]
+# Implement the network architecture
+INPUT_SHAPE = (32, 32, 3)
 
-# Normalize pixel values
-MAX_PIXEL_VALUE = 255
+class_names = class_names = [
+            "airplane",
+            "automobile",
+            "bird",
+            "cat",
+            "deer",
+            "dog",
+            "frog",
+            "horse",
+            "ship",
+            "truck"
+        ]
 
-train_images = train_images / MAX_PIXEL_VALUE
-test_images = test_images / MAX_PIXEL_VALUE
+builder = CNNBuilder()
+builder.add_convolution_layer(32, 3, input_shape=INPUT_SHAPE)
+builder.add_max_pooling_Layer(2)
+builder.add_convolution_layer(64, 3)
+builder.add_max_pooling_Layer(2)
+builder.add_flattening_layer()
+builder.add_fully_connected_layer(128)
+builder.add_output_layer(len(class_names))
+model:Sequential = builder.build()
 
-# One-hot encode labels
-train_labels = to_categorical(train_labels)
-test_labels = to_categorical(test_labels)
+model.summary()
+
+# Compile the model
+compiler = Compiler()
+compiler.compile(model)
+
+# Train the model
+fitter = Fitter(model)
+fitter.fit(train_set, test_set, epochs=5)
+
+# Visualize performance
+perf_plot = PerformancePlot(fitter.training_results)
+perf_plot.plot_accuracy()
