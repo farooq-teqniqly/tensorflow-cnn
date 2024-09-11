@@ -1,5 +1,6 @@
 from tensorflow.keras import Sequential
-from cnn import Cf10, Dataset, CNNBuilder, Compiler, Fitter, PerformancePlot
+from cnn import (Cf10, Dataset, CNNBuilder, Compiler, Fitter, PerformancePlot,
+                 Predictor, ConfusionMatrix)
 
 # Load CF-10 dataset and split into training and test sets
 cf10 = Cf10()
@@ -46,3 +47,11 @@ fitter.fit(train_set, test_set, epochs=5)
 # Visualize performance
 perf_plot = PerformancePlot(fitter.training_results)
 perf_plot.plot_accuracy()
+
+# Make predictions
+predictor = Predictor(model)
+predictions = predictor.predict(test_set)
+
+# Plot confusion matrix
+cm = ConfusionMatrix(test_set.labels, predictions)
+cm.plot()

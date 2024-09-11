@@ -6,6 +6,7 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 from tensorflow.keras.metrics import Precision, Recall
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 _MAX_PIXEL_VALUE=255
 METRICS = ["accuracy", Precision(), Recall()]
@@ -109,6 +110,13 @@ class Fitter:
             batch_size=batch_size,
             validation_data=(test_set.images, test_set.labels))
 
+class Predictor:
+    def __init__(self, model:Sequential):
+        self._model = model
+
+    def predict(self, test_set:Dataset):
+        return self._model.predict(test_set.images)
+
 class PerformancePlot:
     def __init__(self, training_results):
         self._training_results = training_results
@@ -150,4 +158,21 @@ class PerformancePlot:
         plt.xlabel("Epoch")
         plt.ylabel(metric)
         plt.legend(loc="lower right")
+        plt.show()
+
+class ConfusionMatrix:
+    def __init__(self, true_labels, predicted_labels):
+        self._true_labels = np.argmax(true_labels, axis=1)
+        self._predicted_labels = np.argmax(predicted_labels, axis=1)
+
+    def plot(self):
+        cm = confusion_matrix(self._true_labels, self._predicted_labels)
+        cmd = ConfusionMatrixDisplay(confusion_matrix=cm)
+
+        cmd.plot(
+            include_values=True,
+            cmap="inferno",
+            ax=None,
+            xticks_rotation="horizontal")
+
         plt.show()
